@@ -1,21 +1,47 @@
 #include <iostream>
+#include <climits>
+#include <algorithm>
 using namespace std;
 
-int maxSubArraySum(int arr[], int n) {
-    int current_sum = arr[0];
-    int max_sum = arr[0];
+int maxCrossingSum(int arr[], int l, int m, int r) {
+    int sum = 0;
+    int leftSum = INT_MIN;
 
-    for (int i = 1; i < n; i++) {
-        current_sum = max(arr[i], current_sum + arr[i]);
-        max_sum = max(max_sum, current_sum);
+    for (int i = m; i >= l; i--) {
+        sum += arr[i];
+        leftSum = max(leftSum, sum);
     }
-    return max_sum;
+
+    sum = 0;
+    int rightSum = INT_MIN;
+
+    for (int i = m + 1; i <= r; i++) {
+        sum += arr[i];
+        rightSum = max(rightSum, sum);
+    }
+
+    return leftSum + rightSum;
+}
+
+int maxSubArraySum(int arr[], int l, int r) {
+    if (l == r)
+        return arr[l];
+
+    int m = (l + r) / 2;
+
+    int leftMax = maxSubArraySum(arr, l, m);
+    int rightMax = maxSubArraySum(arr, m + 1, r);
+    int crossMax = maxCrossingSum(arr, l, m, r);
+
+    return max(leftMax, max(rightMax, crossMax));
 }
 
 int main() {
     int arr[] = {-2, -5, 6, -2, -3, 1, 5, -6};
     int n = sizeof(arr) / sizeof(arr[0]);
 
-    cout << "Maximum subarray sum is: " << maxSubArraySum(arr, n);
+    cout << "Maximum subarray sum is: "
+         << maxSubArraySum(arr, 0, n - 1);
+
     return 0;
 }
